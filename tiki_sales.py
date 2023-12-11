@@ -17,8 +17,6 @@ def calDeductPercent(originalPrice, price):
 
 calDeductPercentWithArr = np.frompyfunc(calDeductPercent, 2, 1)
 
-filterDf.dropna()
-
 ORIGINAL_PRICE = np.array(filterDf["original_price"])
 PRICE = np.array(filterDf["price"])
 
@@ -26,16 +24,16 @@ PRICE_DEDUCT_PERCENTAGE = calDeductPercentWithArr(ORIGINAL_PRICE, PRICE)
 
 filterDf.insert(2, "price_deduct_perentage", PRICE_DEDUCT_PERCENTAGE)
 
-filterDf['quantity_sold'].replace(0, 1, inplace=True)
-filterDf['review_count'].replace(0, 1, inplace=True)
-filterDf['price_deduct_perentage'].replace(0, 0.000000000001, inplace=True)
+# filterDf['quantity_sold'].replace(0, 1, inplace=True)
+# filterDf['review_count'].replace(0, 1, inplace=True)
+# filterDf['price_deduct_perentage'].replace(0, 0.000000000001, inplace=True)
 
 
 # Overview of supplied data
 # print(filterDf.info())
 
 results = smf.ols(
-    'np.log(quantity_sold) ~ np.log(review_count) * rating_average * price_deduct_perentage', data=filterDf).fit()
+    'quantity_sold ~ review_count + price_deduct_perentage + number_of_images + rating_average', data=filterDf).fit()
 
 print(results.summary())
 fModel = open("./results/models.pkl", "w")
@@ -48,7 +46,7 @@ for index in range(len(results.summary().tables)):
     f.close()
 
 # Overview correlation of quantity_sold vs other aspect to find where to make calculation
-print(filterDf.corr())
+# print(filterDf.corr())
 
 # filterDf.plot(kind='scatter', x='price_deduct_perentage', y='quantity_sold')
 # plt.yscale("log")
